@@ -105,7 +105,6 @@ using namespace std;
 int main(int argc, char * const argv[]) {
     cmdline cmdl(options);
     cmdl.parse(argc, argv);
-    size_t i=0;
 
     Sensores obj;
     Query q;

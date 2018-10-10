@@ -5,11 +5,15 @@
 #include <string>
 
 #include "vector.hpp"
+#include "Tree.hpp"
 
 class Component{
   private:
     std::string id;
     Vector<double> data;
+    SegmentTree<double>* minTree;
+    SegmentTree<double>* maxTree;
+    SegmentTree<double>* avgTree;
 
   public:
     Component(){
@@ -88,6 +92,13 @@ class Component{
     size_t getDataVol(size_t t0, size_t tf){return tf-t0;}
 
     size_t getSize(){return data.getSize();}
+
+    void buildTree()
+    {
+        minTree = new SegmentTree<double>(data,MIN);
+        maxTree = new SegmentTree<double>(data,MAX);
+        avgTree = new SegmentTree<double>(data,AVG);
+    }
 
 };
 

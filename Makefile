@@ -4,9 +4,9 @@ CPPFLAGS = -std=c++98 -Wall -pedantic-errors -g -O0
 WARNINGS = -Wall -Wno-global-constructors #-Wno-weak-vtables -Wno-padded -Wno-reserved-id-macro -Wno-shadow -Wglobal-constructors
 ##CPPFLAGS = -std=c++98 -pedantic-errors -g -O0
 
-all: tp0 clean
+all: tp1 clean
 
-tp0: main.o cmdline.o
+tp1: main.o cmdline.o
 	$(CXX) $(CPPFLAGS) $(WARNINGS) $^ -o $@
 
 cmdline.o: cmdline.cpp
