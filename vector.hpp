@@ -9,6 +9,7 @@
 #include <cctype>
 
 #define SEPARATOR ", "
+#define NEUTRAL_ELEMENT	1e10
 
 using std::ostream;
 using std::istream;
@@ -230,6 +231,11 @@ class Vector {
     size_t getSize() const {
         return size;
     }
+	void fillWithNeutralElem(int n)
+	{
+		for(int i = size;i<n;i++)
+			this->append(NEUTRAL_ELEMENT);
+	}
 
     // Iterator support
     typedef T* iterator;

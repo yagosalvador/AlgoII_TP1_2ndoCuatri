@@ -15,7 +15,7 @@
 #define ERROR_MSG_OPT_REQ_ARG       "Option requires argument: "
 #define ERROR_MSG_UNKNOWN_OPT       "Unknown option: "
 #define ERROR_MSG_MANDATORY_OPT     "Option is mandatory."
-#define HELP_MSG                    "cmdline [-d data] [-i file] [-o file]"
+#define HELP_MSG                    "tp1 [-d data] [-i file] [-o file]"
 
 using std::cerr;
 using std::cout;
