@@ -7,7 +7,6 @@
 #include "errors.hpp"
 #include "vector.hpp"
 #include "component.hpp"
-#include "Tree.hpp"
 
 using namespace std;
 
@@ -29,9 +28,6 @@ class Sensores{
             v[i].setId(ids[i]);
 
     }
-
-    Component operator[](size_t n){return v[n];}
-    size_t getSize(){return v.getSize();}
 
     friend istream& operator>> (istream& is, Sensores& s){
         std::string str;
@@ -66,10 +62,8 @@ class Sensores{
                 s.v[i].append(x);
             }
         }
-
-		for(i=0;i<s.getSize();i++){
-			s.v[i].buildTree();
-		}
+	for(i=0;i<s.v.getSize();i++)
+		s.v[i].buildTree();
 
         return is;
     }
@@ -84,6 +78,9 @@ class Sensores{
         return os;
     }
 
+	Component operator[](size_t n){return v[n];}
+
+	size_t getSize(){return v.getSize();}
 
     ~Sensores(){};
 

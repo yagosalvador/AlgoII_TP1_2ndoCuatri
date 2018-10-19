@@ -231,11 +231,11 @@ class Vector {
     size_t getSize() const {
         return size;
     }
-	void fillWithNeutralElem(int n)
-	{
-		for(int i = size;i<n;i++)
-			this->append(NEUTRAL_ELEMENT);
-	}
+    void fillWithNeutralElem(size_t n)
+    {
+        for(size_t i = size;i<n;i++)
+            this->append(NEUTRAL_ELEMENT);
+    }
 
     // Iterator support
     typedef T* iterator;

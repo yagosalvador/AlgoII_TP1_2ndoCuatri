@@ -35,6 +35,8 @@ class SegmentTree
 	SegmentTree(const Vector<T>& arr, MODE_T mode);
 	template <class U>
 	friend ostream& operator<<(ostream&, const SegmentTree<U>&);
+	T getData(size_t);
+	size_t getSize();
 };
 
 template <class T>
@@ -102,8 +104,8 @@ SegmentTree<T>::SegmentTree(const Vector<T>& arr, MODE_T mode)
 	v.remove(0);
 	}
 	else cout<<"ERROR"<<endl;
-	//cout<<"El arreglo tiene tamanio: "<<v.getSize()<<endl;
-	//cout<<"Quiero completar la potencia con: "<<is2pow(<<endl;
+	n = v.getSize();
+	cout<<"tamanio final del arbol: "<<n<<endl;
 }
 
 template <class U>
@@ -114,6 +116,21 @@ ostream& operator<<(ostream& os, const SegmentTree<U>& tree)
 		os<<tree.v[i]<<'|';
 	return os;
 }
+
+template <class T>
+T SegmentTree<T>::getData(size_t pos)
+{
+	cout<<" el tamanio del arreglo es "<<v.getSize()<<endl;
+	cout<<" el tamanio del arbol "<<n<<endl;
+	cout<<"y yo quiero acceder a "<<pos<<endl;
+	cout<<" Imprimo el arbol "<<endl;
+	for(int i = 0 ; i<pos ; i++)
+		cout<<v[i]<<'|';
+	cout<<endl;
+	return v[pos];
+}
+template <class T>
+size_t SegmentTree<T>::getSize(){return n;}
 
 #endif
 

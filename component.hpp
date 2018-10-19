@@ -78,15 +78,25 @@ class Component{
     }
 
     double getMin(size_t t0, size_t tf){
-        size_t i;
-        double aux = 0;
-
-        for(i = t0, aux = data[i]; i < tf ; i++){
-            if(aux > data[i])
-            aux = data[i];
-        }
-
-        return aux;
+	t0+=data.getSize();
+	tf+=data.getSize();
+	double aux = 1e20;
+	while(t0<tf)
+	{
+		cout<<"t0 = "<<t0<<"tf = "<<tf<<endl;
+		if(t0%2!=0){
+			aux = min(aux,minTree->getData(t0));
+			t0++;
+		}
+		if(tf%2!=0){
+			tf--;
+			aux = min(aux,minTree->getData(tf));
+		}
+		t0/=2;
+		tf/=2;
+	}
+	cout<<"devuelvo min: "<<aux<<endl;
+	return aux;
     }
 
     size_t getDataVol(size_t t0, size_t tf){return tf-t0;}
@@ -98,6 +108,9 @@ class Component{
         minTree = new SegmentTree<double>(data,MIN);
         maxTree = new SegmentTree<double>(data,MAX);
         avgTree = new SegmentTree<double>(data,AVG);
+	//cout<<*minTree<<endl;
+//	cout<<*maxTree<<endl;
+//	cout<<*avgTree<<endl;
     }
 
 };
