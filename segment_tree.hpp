@@ -77,7 +77,7 @@ class Segment_tree{
 
   	size_t getSize(){ return tree.getSize(); }
 
-  	size_t getOrigSize(){ return orig_arr_size; } //technically it returns nearest pow2 of n
+  	size_t getOrigSize(){ return orig_arr_size; } //tecnically it returns nearest pow2 of n
 
   	friend ostream& operator<<(ostream& os, const Segment_tree& t) {
         os << t.tree;
@@ -86,3 +86,5 @@ class Segment_tree{
 
 
 };
+
+#endif
