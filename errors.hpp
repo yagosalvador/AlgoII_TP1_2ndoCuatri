@@ -10,13 +10,14 @@
 #define ERROR_MSG_MANDATORY_OPT     "Option is mandatory."
 #define HELP_MSG                    "cmdline [-d data] [-i file] [-o file]"
 #define ERROR_DATABASE				"Error Database"
-#define STATUS_SIZE 4
+#define STATUS_SIZE 5
 
 std::string status_dict[STATUS_SIZE] = {
     "OK",
     "UNKNOWN ID",
     "BAD QUERY",
-    "NO DATA"
+    "NO DATA",
+    ""
 };
 
 #endif

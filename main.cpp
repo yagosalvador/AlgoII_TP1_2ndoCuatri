@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstdlib>
 
+#include "sensor_data.hpp"
 #include "errors.hpp"
 #include "cmdline.hpp"
 #include "component.hpp"
@@ -19,11 +20,15 @@ static void opt_data(string const &);
 static void opt_help(string const &);
 
 
+
 static std::fstream dfs;
 static std::istream *iss = 0;
 static std::fstream ifs;
 static std::ostream *oss = 0;
 static std::fstream ofs;
+
+using namespace std;
+
 
 // syntax: {needs argument,
 //          short name,

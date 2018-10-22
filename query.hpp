@@ -5,17 +5,17 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <limits>
 
 #include "errors.hpp"
 #include "sensors.hpp"
-
-using namespace std;
 
 typedef enum {
     OK = 0,
     UNKNOWN_ID = 1,
     BAD_QUERY = 2,
-    NO_DATA = 3
+    NO_DATA = 3,
+    EMPTY = 4
 } status_t;
 
 class Query{
@@ -24,6 +24,7 @@ class Query{
     size_t t0;
     size_t tf;
     bool bad;
+    bool empty;
 
   public:
     Query(){
@@ -31,6 +32,7 @@ class Query{
         t0 = 0;
         tf = 0;
         bad = false;
+        empty = false;
     }
 
     ~Query(){};
@@ -115,6 +117,17 @@ class Query{
         size_t t0 = 0;
         size_t tf = 0;
         char ch = 0;
+        /*static int i=0;
+
+        while(i != 2){
+            is.get(ch);
+            std::cout << ch;
+            is.get(ch);
+            std::cout << ch << "hola";
+            i++;
+        }*/
+
+
 
         if (is >> ch) {
             is.putback(ch);
@@ -142,8 +155,6 @@ class Query{
             }
             else
                 good = false;
-            //else if(str.length() == 
-            //}
         } else if (is.good()) { //read only id
             is.putback(ch);
             good = (getline(is,str,',')) ? true : false;
@@ -165,7 +176,7 @@ class Query{
         static Query::Response r;
         std::string str;
         size_t i;
-        double absurd = -1000;
+        double absurd = std::numeric_limits<double>::quiet_NaN();;
         double max_aux = absurd, min_aux = absurd, avg_aux = absurd;
 
         if(bad == true){
@@ -173,6 +184,10 @@ class Query{
             return r;
         }
 
+        if(empty == true){
+            r.setStatus(EMPTY);
+            return r;
+        }
         if(id == ""){ //no id specified
             for(i=0; i < s.getSize(); i++){
                 if(t0 <= tf && t0 <= s[i].getSize()){

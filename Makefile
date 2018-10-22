@@ -4,15 +4,15 @@ CPPFLAGS = -std=c++98 -Wall -pedantic-errors -g -O0
 WARNINGS = -Wall -Wno-global-constructors #-Wno-weak-vtables -Wno-padded -Wno-reserved-id-macro -Wno-shadow -Wglobal-constructors
 ##CPPFLAGS = -std=c++98 -pedantic-errors -g -O0
 
-all: tp1 clean
+all: tp0 clean
 
-tp1: main.o cmdline.o
+tp0: main.o cmdline.o
 	$(CXX) $(CPPFLAGS) $(WARNINGS) $^ -o $@
 
 cmdline.o: cmdline.cpp
 	$(CXX) -c $(CPPFLAGS) $^ -o $@
 
-main.o: main.cpp query.hpp sensors.hpp vector.hpp errors.hpp
+main.o: main.cpp sensor_data.hpp query.hpp sensors.hpp vector.hpp errors.hpp
 	$(CXX) -c $(CPPFLAGS) $(WARNINGS) $< -o $@
 
 

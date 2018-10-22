@@ -7,8 +7,7 @@
 #include "errors.hpp"
 #include "vector.hpp"
 #include "component.hpp"
-
-using namespace std;
+#include "sensor_data.hpp"
 
 class Sensores{
   private:
@@ -33,11 +32,12 @@ class Sensores{
         std::string str;
         std::stringstream iss;
         Component obj;
-        double x;
+        Sensor_data x;
         size_t i;
 
         getline(is,str);
-        str.resize(str.length()-1);//to eliminate last null char, and avoid having two of them with next getline
+        if(str[str.length()-1] == 0x0d)
+        	str.resize(str.length()-1);//to eliminate carriage return
         iss << str;
         while(getline(iss,str,',')){
             if(str.length() == 1){ //in case empty str
@@ -62,8 +62,6 @@ class Sensores{
                 s.v[i].append(x);
             }
         }
-	for(i=0;i<s.v.getSize();i++)
-		s.v[i].buildTree();
 
         return is;
     }

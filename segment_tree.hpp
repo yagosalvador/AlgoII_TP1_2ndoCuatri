@@ -23,6 +23,25 @@ class Segment_tree{
 
   	~Segment_tree(){};
 
+  	Segment_tree(const Vector<T> &arr){ //vol size set as default
+  		size_t size = pow(2, ceil(log(arr.getSize())/log(2))); //nearest pow 2
+  		orig_arr_size = size;
+
+
+  		for (size_t i = 0; i < (2*size); i++){
+  				tree.append(0);// sets half of the tree with empty data
+  				if(i >= (2*size-1) - arr.getSize()){
+  					if(arr[i].isEmpty())
+  						tree.append(0);
+  					else
+  						tree.append(1); //concatenates arr and resizes to 2^n-1
+  				}
+  		}
+
+  		for (size_t i = tree.getSize()-1; i > 0 ; i-=2) 
+  			tree[(i-2)/2] = tree[i] + tree[i-1];
+	}
+
   	Segment_tree(const Vector<T> &arr, Mode_t mode){
   		size_t size = pow(2, ceil(log(arr.getSize())/log(2))); //nearest pow 2
   		orig_arr_size = size;
@@ -84,7 +103,4 @@ class Segment_tree{
         return os;
     }
 
-
 };
-
-#endif

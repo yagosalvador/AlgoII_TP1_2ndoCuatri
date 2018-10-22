@@ -3,17 +3,16 @@
 
 #include <iostream>
 #include <string>
+#include "sensor_data.hpp"
 
 #include "vector.hpp"
-#include "Tree.hpp"
+
+using namespace std;
 
 class Component{
   private:
     std::string id;
-    Vector<double> data;
-    SegmentTree<double>* minTree;
-    SegmentTree<double>* maxTree;
-    SegmentTree<double>* avgTree;
+    Vector<Sensor_data> data;
 
   public:
     Component(){
@@ -27,7 +26,7 @@ class Component{
         data = c.data;
     }
 
-    Component(std::string str, Vector<double> d){
+    Component(std::string str, Vector<Sensor_data> d){
         id = str;
         data = d;
     }
@@ -38,7 +37,7 @@ class Component{
 
     std::string showId() const{return id;}
 
-    void append(double x){
+    void append(Sensor_data x){
         data.append(x);
         return;
     }
@@ -59,59 +58,58 @@ class Component{
         size_t i, j;
         double sum = 0;
 
+        if(t0 == tf){
+            if(data[tf].isEmpty())
+                return std::numeric_limits<double>::quiet_NaN();//REVISAAAAAAAAAAAAAAAAAAAAR
+            return data[tf].getData();
+        }
         for(i = t0, j = 0; i < tf ; j++, i++)
-            sum += data[i];
-            
+            if(data[i].isEmpty())
+                j--;
+            else
+                sum += data[i].getData();
+
         return sum/j; 
     }
 
     double getMax(size_t t0, size_t tf){
-        size_t i;
+        size_t i = t0;
         double aux = 0;
 
-        for(i = t0, aux = data[i]; i < tf ;i++){
-            if(aux < data[i])
-                aux = data[i];
+
+        while(data[i].isEmpty()) //check until finding a value that is valid
+            i++;
+
+        for(aux = data[i].getData(); i < tf ;i++){
+            if(!data[i].isEmpty()){
+                if(aux < data[i].getData())
+                    aux = data[i].getData();
+            }
         }
 
         return aux;
     }
 
     double getMin(size_t t0, size_t tf){
-	t0+=data.getSize();
-	tf+=data.getSize();
-	double aux = 1e20;
-	while(t0<tf)
-	{
-		cout<<"t0 = "<<t0<<"tf = "<<tf<<endl;
-		if(t0%2!=0){
-			aux = min(aux,minTree->getData(t0));
-			t0++;
-		}
-		if(tf%2!=0){
-			tf--;
-			aux = min(aux,minTree->getData(tf));
-		}
-		t0/=2;
-		tf/=2;
-	}
-	cout<<"devuelvo min: "<<aux<<endl;
-	return aux;
+        size_t i = t0;
+        double aux = 0;
+
+        while(data[i].isEmpty()) //check until finding a value that is valid
+            i++;
+
+        for(aux = data[i].getData(); i < tf ; i++){
+            if(!data[i].isEmpty()){
+                if(aux > data[i].getData())
+                    aux = data[i].getData();
+            }
+        }
+
+        return aux;
     }
 
     size_t getDataVol(size_t t0, size_t tf){return tf-t0;}
 
     size_t getSize(){return data.getSize();}
-
-    void buildTree()
-    {
-        minTree = new SegmentTree<double>(data,MIN);
-        maxTree = new SegmentTree<double>(data,MAX);
-        avgTree = new SegmentTree<double>(data,AVG);
-	//cout<<*minTree<<endl;
-//	cout<<*maxTree<<endl;
-//	cout<<*avgTree<<endl;
-    }
 
 };
 
