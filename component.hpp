@@ -25,11 +25,18 @@ class Component{
         id = c.id;
         data = c.data;
     }
+    
+    Component(std::string str){
+        id = str;
+    }
 
     Component(std::string str, Vector<Sensor_data> d){
         id = str;
         data = d;
     }
+
+    Sensor_data operator[](size_t n){return data[n];}
+
 
     void setId(std::string str){
         id = str;
@@ -54,58 +61,63 @@ class Component{
         return *this;
     }
 
-    double getAvg(size_t t0, size_t tf){
+    Sensor_data getAvg(size_t t0, size_t tf){
         size_t i, j;
-        double sum = 0;
+        Sensor_data sum;
 
-        if(t0 == tf){
-            if(data[tf].isEmpty())
-                return std::numeric_limits<double>::quiet_NaN();//REVISAAAAAAAAAAAAAAAAAAAAR
-            return data[tf].getData();
-        }
-        for(i = t0, j = 0; i < tf ; j++, i++)
-            if(data[i].isEmpty())
+        for(i = t0, j = 0; i < tf ; j++, i++){
+            if(data[i].isEmpty()){
                 j--;
-            else
-                sum += data[i].getData();
+            }
+            else{
+                sum += data[i];
+            }
+        }
 
-        return sum/j; 
+        if(sum.isEmpty()){
+            return sum;
+        }
+        else{
+            sum = sum.getValue()/j;
+            return sum;
+        }
     }
 
-    double getMax(size_t t0, size_t tf){
+    Sensor_data getMax(size_t t0, size_t tf){
         size_t i = t0;
-        double aux = 0;
-
+        Sensor_data aux;
 
         while(data[i].isEmpty()) //check until finding a value that is valid
             i++;
 
-        for(aux = data[i].getData(); i < tf ;i++){
+        for(aux = data[i]; i < tf ;i++){
             if(!data[i].isEmpty()){
-                if(aux < data[i].getData())
-                    aux = data[i].getData();
+                if(aux < data[i])
+                    aux = data[i];
             }
         }
 
         return aux;
     }
 
-    double getMin(size_t t0, size_t tf){
+    Sensor_data getMin(size_t t0, size_t tf){
         size_t i = t0;
-        double aux = 0;
+        Sensor_data aux;
 
         while(data[i].isEmpty()) //check until finding a value that is valid
             i++;
 
-        for(aux = data[i].getData(); i < tf ; i++){
+        for(aux = data[i]; i < tf ; i++){
             if(!data[i].isEmpty()){
-                if(aux > data[i].getData())
-                    aux = data[i].getData();
+                if(aux > data[i])
+                    aux = data[i];
             }
         }
-
+    
         return aux;
     }
+
+    Vector<Sensor_data> getData(){ return data ;}
 
     size_t getDataVol(size_t t0, size_t tf){return tf-t0;}
 

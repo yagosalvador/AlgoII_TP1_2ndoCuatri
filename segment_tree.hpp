@@ -4,14 +4,14 @@
 #include <iostream>
 #include <cmath>
 #include "vector.hpp"
+#include "utils.hpp"
 
-typedef double (* Mode_t)(const double & x, const double & y);
+typedef Sensor_data (* Mode_t)(const Sensor_data & x, const Sensor_data & y);
 
 
-template <typename T>
 class Segment_tree{
   private:
-	Vector<T> tree;
+	Vector<Sensor_data> tree;
 	size_t orig_arr_size;
 	Mode_t segment_mode;
 
@@ -19,66 +19,87 @@ class Segment_tree{
   	Segment_tree(){
   		orig_arr_size = 0;
   		segment_mode = 0;
-  	};
+  	}
 
   	~Segment_tree(){};
 
-  	Segment_tree(const Vector<T> &arr){ //vol size set as default
+  	Segment_tree(const Vector<Sensor_data> &arr){ //vol size set as default
   		size_t size = pow(2, ceil(log(arr.getSize())/log(2))); //nearest pow 2
   		orig_arr_size = size;
+  		Sensor_data t;
+  		double zero = 0;
+  		segment_mode = sum;
 
-
-  		for (size_t i = 0; i < (2*size); i++){
-  				tree.append(0);// sets half of the tree with empty data
-  				if(i >= (2*size-1) - arr.getSize()){
-  					if(arr[i].isEmpty())
-  						tree.append(0);
-  					else
-  						tree.append(1); //concatenates arr and resizes to 2^n-1
+  		for (size_t i = 0, j=0; i < (2*size-1); i++){ 
+  				if(i >= size && i < (size + arr.getSize()) ){// sets half of the tree with empty data
+                    if(!arr[j] && (double)arr[j] != zero){
+                        t = 0;
+                        tree.append(t);
+                        j++;
+                    }
+                    else{
+  						t = 1;
+  						tree.append(t); //concatenates arr and resizes to 2^n-1
+                        j++;
+                    }
   				}
+  				else{
+  					t = 0;
+  					tree.append(t);
+  				}
+
   		}
 
-  		for (size_t i = tree.getSize()-1; i > 0 ; i-=2) 
-  			tree[(i-2)/2] = tree[i] + tree[i-1];
+  		fillTree(segment_mode);
 	}
 
-  	Segment_tree(const Vector<T> &arr, Mode_t mode){
+  	Segment_tree(const Vector<Sensor_data> &arr, Mode_t mode){
   		size_t size = pow(2, ceil(log(arr.getSize())/log(2))); //nearest pow 2
   		orig_arr_size = size;
+  		Sensor_data t;
+  		size_t i,j;
 
-
-  		for (size_t i = 0; i < (2*size-1) - arr.getSize(); i++)
-  				tree.append(0);// sets half of the tree with empty data
-  		tree += arr; //concatenates arr and resizes to 2^n-1
+  		for (i = 0, j = 0; i < 2*size-1; i++){
+  				if(i >= size && i < (size + arr.getSize()-1) ){
+  					tree.append(arr[j]); //concatenates arr and resizes to 2^n-1
+   					j++;
+  				}
+  				else
+  					tree.append(t);// sets half of the tree with empty data
+  		}
+  		
 
   		fillTree(mode);
   		segment_mode = mode;
   	}
 
   	void fillTree(const Mode_t& mode){
-  		for (size_t i = tree.getSize()-1; i > 0 ; i-=2) 
-  			tree[(i-2)/2] = (*mode)(tree[i], tree[i-1]);
+  		int i;
+
+  		for (i = tree.getSize()-1; ((i-2)/2) >= 0 ; i-=2){
+  			tree[(i-2)/2] = (*mode)(tree[i-1], tree[i]);
+        }
   	}
 
-	T getSegment(size_t t0, size_t tf){
-		t0+=orig_arr_size-1;
-		tf+=orig_arr_size-1;
-		T aux;
+	Sensor_data getSegment(size_t t0, size_t tf){
+		t0+=orig_arr_size+1;
+		tf+=orig_arr_size+1;
+		Sensor_data aux;
 		size_t i = 0;
 
 		while(t0 < tf)
 		{
-			if(t0%2!=0){
+			if(t0%2==0){
 				if(i == 0){
 					aux = tree[t0];
-					i++;
+                         i++;
 				}
 				else{
 					aux = segment_mode(aux,tree[t0]);
 					t0++;
 				}
 			}
-			if(tf%2!=0){
+			if(tf%2==0){
 				if(i == 0){
 					aux = tree[tf];
 					i++;
@@ -104,3 +125,5 @@ class Segment_tree{
     }
 
 };
+
+#endif

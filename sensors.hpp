@@ -32,8 +32,9 @@ class Sensores{
         std::string str;
         std::stringstream iss;
         Component obj;
-        Sensor_data x;
+        Sensor_data x,empty_data;
         size_t i;
+        char ch;
 
         getline(is,str);
         if(str[str.length()-1] == 0x0d)
@@ -47,22 +48,30 @@ class Sensores{
             obj.setId(str);
             s.v.append(obj);
         }
+        iss.clear();
 
-
+        ch = is.get();
+        if(!is.eof())
+            is.putback(ch);
         while(!is.eof()){
-            for(i=0; i < s.v.getSize() && !is.eof(); i++){
+                getline(is,str);
+                x = empty_data;
                 if(is.fail()){
-                	std::cerr << ERROR_DATABASE << std::endl; //if empty, complete with 0, last value or what?
+                	std::cerr << ERROR_DATABASE << std::endl;
                 	exit(1);
                 }
-                is >> x;
-                if(is.eof())
-                    break;
-                is.ignore(1,',');
-                s.v[i].append(x);
-            }
+                iss << str;
+                for(i = 0; i < s.v.getSize(); i++){
+                    iss >> x;
+                    if(is.fail())
+                        x = empty_data;
+                    iss.ignore(1,',');
+                    s.v[i].append(x);
+                    if(i == s.v.getSize()-1)
+                        getline(iss,str);//in case there are extra columns
+                }
+                iss.clear();
         }
-
         return is;
     }
 
@@ -77,6 +86,8 @@ class Sensores{
     }
 
 	Component operator[](size_t n){return v[n];}
+
+    void append(const Component &c){v.append(c);}
 
 	size_t getSize(){return v.getSize();}
 

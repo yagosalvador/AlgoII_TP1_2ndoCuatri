@@ -1,5 +1,5 @@
-#ifndef QUERY_HPP__
-#define QUERY_HPP__
+#ifndef QUERY_TREE_HPP__
+#define QUERY_TREE_HPP__
 
 #include <iostream>
 #include <string>
@@ -10,6 +10,7 @@
 #include "errors.hpp"
 #include "utils.hpp"
 #include "sensors.hpp"
+#include "segment_tree.hpp"
 
 typedef enum {
     OK = 0,
@@ -44,13 +45,6 @@ class Query{
         tf = b;
     }
 
-    std::string showId(){return id;}
-    size_t showT0(){return t0;}
-    size_t showTF(){return tf;}
-    bool isBad(){return bad;}
-    bool isEmpty(){return empty;}
-
-
     Query(const Query& q){
       id = q.id;
       t0 = q.t0;
@@ -70,6 +64,13 @@ class Query{
         ss >> t0;
         ss >> tf;
     }
+
+    std::string showId(){return id;}
+    size_t showT0(){return t0;}
+    size_t showTF(){return tf;}
+    bool isBad(){return bad;}
+    bool isEmpty(){return empty;}
+
 
     Query(std::stringstream ss){
         ss >> id;
@@ -114,7 +115,8 @@ class Query{
                 return os;
             }
 
-            os << std::setprecision(15) << r.avg << ',' << r.min << ',' << r.max << ',' << r.vol;
+            os << std::setprecision(13) << r.avg;
+            os << ',' << r.min << ',' << r.max << ',' << r.vol;
             return os;
         }
     };
@@ -214,12 +216,14 @@ class Query{
         return is;
     }
 
+
     const Query::Response& resolve(Sensores& s){
         static Query::Response r;
         std::string str;
-        size_t i=0;
-        //double absurd = std::numeric_limits<double>::quiet_NaN();;
-        Sensor_data max_aux, min_aux, avg_aux;        
+        size_t i;
+        double absurd = -1000000;
+        double max_aux = absurd, min_aux = absurd, sum_aux = absurd, vol_aux = absurd, avg_aux = absurd;
+        Segment_tree tree;
 
         if(bad == true){
             r.setStatus(BAD_QUERY);
@@ -231,61 +235,77 @@ class Query{
             return r;
         }
 
+        if(t0 == tf){
+            r.setStatus(NO_DATA);
+            return r;
+        }
+
         if(empty == true){
             r.setStatus(EMPTY);
             return r;
         }
 
-        if(t0 == tf){
-            r.setStatus(NO_DATA);
-            return r;
-        }
         if(id == ""){ //no id specified
             for(i=0; i < s.getSize(); i++){
-                if(t0 < tf && t0 < s[i].getSize()){                    
+                if(t0 < tf && t0 < s[i].getSize()){
                     if (tf > s[i].getSize())
                       tf = s[i].getSize();
                     if(i == 0){
-                        max_aux = s[i].getMax(t0,tf);
-                        min_aux = s[i].getMin(t0,tf);
-                        avg_aux = s[i].getAvg(t0,tf);
+                        tree = Segment_tree(s[i].getData(),max);
+                        max_aux = tree.getSegment(t0,tf);
+                        tree = Segment_tree(s[i].getData(),min);
+                        min_aux = tree.getSegment(t0,tf);
+                        tree = Segment_tree(s[i].getData(),sum);
+                        sum_aux = tree.getSegment(t0,tf);
+                        tree = Segment_tree(s[i].getData());
+                        vol_aux = tree.getSegment(t0,tf);
+                        avg_aux = sum_aux/vol_aux;
                     }
                     else {
-                        max_aux += s[i].getMax(t0,tf);
-                        min_aux += s[i].getMin(t0,tf);
-                        avg_aux += s[i].getAvg(t0,tf);
+                        tree = Segment_tree(s[i].getData(),max);
+                        max_aux = tree.getSegment(t0,tf) + max_aux;
+                        tree = Segment_tree(s[i].getData(),min);
+                        min_aux = tree.getSegment(t0,tf) + min_aux;
+                        tree = Segment_tree(s[i].getData(),sum);
+                        sum_aux = tree.getSegment(t0,tf);
+                        tree = Segment_tree(s[i].getData());
+                        vol_aux = tree.getSegment(t0,tf);
+                        avg_aux = sum_aux/vol_aux + avg_aux;
                     }
                 }
             }
-            if (max_aux.isEmpty() && min_aux.isEmpty() && avg_aux.isEmpty()){
+            if (max_aux == absurd && min_aux == absurd && avg_aux == absurd){
                 r.setStatus(NO_DATA);
                 return r;
             }
-            r.setAvg(avg_aux.getValue()/i);
-            r.setMin(min_aux.getValue()/i);
-            r.setMax(max_aux.getValue()/i);
+
+            r.setAvg(avg_aux/i);
+            r.setMin(min_aux/i);
+            r.setMax(max_aux/i);
             r.setVol(tf - t0);
             r.setStatus(OK);
             return r;
         }
+
         for(i=0; i < s.getSize(); i++){
             if(s[i].showId() == id){
                 if(t0 < tf && t0 < s[i].getSize()){
-                    if (tf > s[i].getSize()){
+                    if (tf > s[i].getSize())
                         tf = s[i].getSize();
-                    }
-                    avg_aux = s[i].getAvg(t0,tf);
-                    min_aux = s[i].getMin(t0,tf);
-                    max_aux = s[i].getMax(t0,tf);
-                    if (max_aux.isEmpty() && min_aux.isEmpty() && avg_aux.isEmpty())
-                        r.setStatus(NO_DATA);
-                    else{
-                        r.setAvg(avg_aux.getValue());
-                        r.setMin(min_aux.getValue());
-                        r.setMax(max_aux.getValue());
-                        r.setVol(tf - t0);
-                        r.setStatus(OK);
-                    }
+                    tree = Segment_tree(s[i].getData(),max);                    
+                    max_aux = tree.getSegment(t0,tf);
+                    tree = Segment_tree(s[i].getData(),min);
+                    min_aux = tree.getSegment(t0,tf);
+                    tree = Segment_tree(s[i].getData(),sum);
+                    sum_aux = tree.getSegment(t0,tf);
+                    tree = Segment_tree(s[i].getData());
+                    vol_aux = tree.getSegment(t0,tf);
+                    avg_aux = sum_aux/vol_aux;
+                    r.setAvg(avg_aux);
+                    r.setMin(min_aux);
+                    r.setMax(max_aux);
+                    r.setVol(tf - t0);
+                    r.setStatus(OK);
                     return r;
                 }
                 r.setStatus(NO_DATA);

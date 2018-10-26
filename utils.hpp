@@ -1,22 +1,25 @@
 #ifndef UTILS__H
 #define UTILS__H
 
+#include <iostream>
+#include "sensor_data.hpp"
+using namespace std;
 
-double min(const double & x, const double & y){
-	cout<< "hola" <<endl;
+Sensor_data min(const Sensor_data & x, const Sensor_data & y){
+	if(x < y){
+		return x;
+	}
+	else
+		return y;
+}
+
+Sensor_data max(const Sensor_data & x,const Sensor_data & y){
 	if(x > y)
-		return y;
-	else
 		return x;
+	else
+		return y;
 }
 
-double max(const double & x,const double & y){
-	if(x < y)
-		return y;
-	else
-		return x;
-}
-
-double sum(const double & x, const double & y){ return (x+y); }
+Sensor_data sum(const Sensor_data & x, const Sensor_data & y){ return (x+y); }
 
 #endif
